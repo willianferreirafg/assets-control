@@ -54,7 +54,7 @@ public class EquipamentoServlet extends HttpServlet {
             request.setAttribute("busca", termo == null ? "" : termo);
             request.setAttribute(
                     "sucesso",
-                    "1".equals(request.getParameter("sucesso"))
+                    request.getParameter("sucesso")
             );
 
             String editarTexto = request.getParameter("editar");
@@ -115,6 +115,50 @@ public class EquipamentoServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
+        String acao = valor(request, "acao");
+
+        // Exclusão tratada antes das validações
+        // de cadastro e edição
+        if ("excluir".equals(acao)) {
+            String idTexto = valor(request, "id");
+
+            try {
+                long id = Long.parseLong(idTexto);
+
+                if (id <= 0) {
+                    throw new NumberFormatException();
+                }
+
+                boolean excluido = equipamentoDAO.excluir(id);
+
+                if (!excluido) {
+                    response.sendError(
+                            HttpServletResponse.SC_NOT_FOUND,
+                            "Equipamento não encontrado."
+                    );
+                    return;
+                }
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/equipamentos?sucesso=3"
+                );
+                return;
+
+            } catch (NumberFormatException e) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "ID de equipamento inválido."
+                );
+                return;
+
+            } catch (SQLException e) {
+                throw new ServletException(
+                        "Erro ao excluir o equipamento.", e
+                );
+            }
+        }
+
         String patrimonio = valor(request, "patrimonio");
         String categoria = valor(request, "categoria");
         String marca = valor(request, "marca");
@@ -124,7 +168,6 @@ public class EquipamentoServlet extends HttpServlet {
         String setorIdTexto = valor(request, "setorId");
         String observacoes = valor(request, "observacoes");
 
-        String acao = valor(request, "acao");
         boolean modoEdicao = "atualizar".equals(acao);
 
         Long idEdicao = null;

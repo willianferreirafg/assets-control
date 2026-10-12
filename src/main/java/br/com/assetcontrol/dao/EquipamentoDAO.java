@@ -365,4 +365,24 @@ public class EquipamentoDAO {
             return statement.executeUpdate() == 1;
         }
     }
+
+    // ============================================================
+    // EXCLUSÃO DE EQUIPAMENTOS
+    // ============================================================
+    public boolean excluir(long id) throws SQLException {
+        String sql = """
+            DELETE FROM equipamento
+            WHERE id = ?
+            """;
+
+        try (
+                Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setLong(1, id);
+
+            return statement.executeUpdate() == 1;
+        }
+    }
+
 }

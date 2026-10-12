@@ -1,11 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>AssetControl - Equipamentos</title>
 
     <style>
@@ -15,6 +18,14 @@
             margin: 30px auto;
             padding: 0 20px;
             color: #222;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin-bottom: 5px;
         }
 
         form {
@@ -30,7 +41,10 @@
             gap: 5px;
         }
 
-        input, select, textarea, button {
+        input,
+        select,
+        textarea,
+        button {
             padding: 10px;
             font: inherit;
         }
@@ -39,8 +53,28 @@
             resize: vertical;
         }
 
+        button {
+            cursor: pointer;
+        }
+
         .full {
             grid-column: 1 / -1;
+        }
+
+        .success {
+            color: #176b35;
+            background: #eaf7ee;
+            border: 1px solid #b7e4c7;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .error {
+            color: #a61b1b;
+        }
+
+        .table-wrapper {
+            width: 100%;
         }
 
         table {
@@ -48,7 +82,8 @@
             border-collapse: collapse;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             border-bottom: 1px solid #ddd;
             text-align: left;
@@ -58,8 +93,25 @@
             background: #f2f4f7;
         }
 
-        .success {
-            color: #176b35;
+        .actions {
+            white-space: nowrap;
+        }
+
+        .actions form {
+            display: inline;
+            margin: 0;
+        }
+
+        .btn-delete {
+            background: #b42318;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        .btn-delete:hover {
+            background: #8f1c13;
         }
 
         @media (max-width: 650px) {
@@ -73,6 +125,10 @@
 
             .table-wrapper {
                 overflow-x: auto;
+            }
+
+            table {
+                min-width: 750px;
             }
         }
     </style>
@@ -91,17 +147,34 @@
 
 <main>
 
-    <c:if test="${sucesso}">
+    <!-- Mensagens de sucesso -->
+
+    <c:if test="${sucesso == '1'}">
         <p class="success" role="status">
             Equipamento cadastrado com sucesso!
         </p>
     </c:if>
+
+    <c:if test="${sucesso == '2'}">
+        <p class="success" role="status">
+            Equipamento atualizado com sucesso!
+        </p>
+    </c:if>
+
+    <c:if test="${sucesso == '3'}">
+        <p class="success" role="status">
+            Equipamento excluído com sucesso!
+        </p>
+    </c:if>
+
+    <!-- Formulário de cadastro e edição -->
 
     <h2>
         <c:choose>
             <c:when test="${not empty equipamentoEdicao}">
                 Editar equipamento
             </c:when>
+
             <c:otherwise>
                 Cadastrar equipamento
             </c:otherwise>
@@ -115,7 +188,8 @@
             <c:when test="${not empty equipamentoEdicao}">
                 <input type="hidden" name="acao" value="atualizar">
 
-                <input type="hidden" name="id"
+                <input type="hidden"
+                       name="id"
                        value="<c:out value='${equipamentoEdicao.id}'/>">
             </c:when>
 
@@ -257,6 +331,7 @@
         </label>
 
         <div class="full">
+
             <button type="submit">
                 <c:choose>
                     <c:when test="${not empty equipamentoEdicao}">
@@ -274,9 +349,12 @@
                     Cancelar edição
                 </a>
             </c:if>
+
         </div>
 
     </form>
+
+    <!-- Pesquisa de equipamentos -->
 
     <h2>Equipamentos cadastrados</h2>
 
@@ -286,14 +364,13 @@
         <label class="full">
             Pesquisar por patrimônio, categoria, marca ou modelo
 
-            <input
-                type="search"
-                name="busca"
-                value="<c:out value='${busca}'/>"
-                placeholder="Ex.: PAT-0001, Dell ou Notebook">
+            <input type="search"
+                   name="busca"
+                   value="<c:out value='${busca}'/>"
+                   placeholder="Ex.: PAT-0001, Dell ou Notebook">
         </label>
 
-        <div>
+        <div class="full">
             <button type="submit">Pesquisar</button>
 
             <a href="${pageContext.request.contextPath}/equipamentos">
@@ -302,6 +379,8 @@
         </div>
 
     </form>
+
+    <!-- Tabela de equipamentos -->
 
     <div class="table-wrapper">
 
@@ -347,10 +426,34 @@
                                    default="Sem setor"/>
                         </td>
 
-                        <td>
+                        <td class="actions">
+
+                            <!-- Editar equipamento -->
+
                             <a href="${pageContext.request.contextPath}/equipamentos?editar=${equipamento.id}">
                                 Editar
                             </a>
+
+                            <!-- Excluir equipamento -->
+
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/equipamentos"
+                                  onsubmit="return confirm('Tem certeza de que deseja excluir este equipamento?');">
+
+                                <input type="hidden"
+                                       name="acao"
+                                       value="excluir">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="<c:out value='${equipamento.id}'/>">
+
+                                <button type="submit" class="btn-delete">
+                                    Excluir
+                                </button>
+
+                            </form>
+
                         </td>
                     </tr>
                 </c:forEach>
