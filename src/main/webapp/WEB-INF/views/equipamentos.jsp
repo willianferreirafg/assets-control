@@ -168,6 +168,27 @@
 
     <h2>Equipamentos cadastrados</h2>
 
+    <form method="get"
+          action="${pageContext.request.contextPath}/equipamentos">
+
+        <label class="full">
+            Pesquisar por patrimônio, categoria, marca ou modelo
+            <input
+                type="search"
+                name="busca"
+                value="<c:out value='${busca}'/>"
+                placeholder="Ex.: PAT-0001, Dell ou Notebook"
+            >
+        </label>
+
+        <div>
+            <button type="submit">Pesquisar</button>
+            <a href="${pageContext.request.contextPath}/equipamentos">
+                Limpar pesquisa
+            </a>
+        </div>
+    </form>
+
     <div class="table-wrapper">
         <table>
             <thead>

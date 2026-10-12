@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="ae02b094-c9ac-4804-8e4b-28f2854cf9e6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/Controller/HelloServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/controller/HelloServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/config/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/config/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/controller/EquipamentoServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/controller/EquipamentoServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/dao/EquipamentoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/assetcontrol/dao/EquipamentoDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/equipamentos.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/equipamentos.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,5 +101,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/br/com/assetcontrol/config/DatabaseConnection.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

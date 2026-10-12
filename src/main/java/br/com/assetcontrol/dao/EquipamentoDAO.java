@@ -15,6 +15,9 @@ import java.util.List;
 
 public class EquipamentoDAO {
 
+    // ============================================================
+    // LISTAGEM DE EQUIPAMENTOS
+    // ============================================================
     public List<Equipamento> listarTodos() throws SQLException {
         String sql = """
                 SELECT
@@ -77,6 +80,9 @@ public class EquipamentoDAO {
         return equipamentos;
     }
 
+    // ============================================================
+    // CADASTRO DE EQUIPAMENTOS
+    // ============================================================
     public void cadastrar(Equipamento equipamento)
             throws SQLException {
 
@@ -148,6 +154,9 @@ public class EquipamentoDAO {
         }
     }
 
+    // ============================================================
+    // LISTAGEM DE SETORES ONDE ESTÃO OS EQUIPAMENTOS
+    // ============================================================
     public List<Setor> listarSetores() throws SQLException {
         String sql = """
             SELECT id, nome, unidade_id
@@ -173,5 +182,79 @@ public class EquipamentoDAO {
         }
 
         return setores;
+    }
+
+    // ============================================================
+    // PESQUISA DE EQUIPAMENTOS
+    // ============================================================
+    public List<Equipamento> buscar(String termo) throws SQLException {
+        String sql = """
+            SELECT
+                e.id,
+                e.patrimonio,
+                e.categoria,
+                e.marca,
+                e.modelo,
+                e.numero_serie,
+                e.status,
+                e.setor_id,
+                s.nome AS setor_nome,
+                e.observacoes
+            FROM equipamento e
+            LEFT JOIN setor s ON s.id = e.setor_id
+            WHERE
+                LOWER(e.patrimonio) LIKE LOWER(?)
+                OR LOWER(e.categoria) LIKE LOWER(?)
+                OR LOWER(COALESCE(e.marca, '')) LIKE LOWER(?)
+                OR LOWER(COALESCE(e.modelo, '')) LIKE LOWER(?)
+            ORDER BY e.id DESC
+            """;
+
+        String filtro = "%" + termo.trim() + "%";
+
+        List<Equipamento> equipamentos = new ArrayList<>();
+
+        try (
+                Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            for (int i = 1; i <= 4; i++) {
+                statement.setString(i, filtro);
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Equipamento equipamento = new Equipamento();
+
+                    equipamento.setId(resultSet.getLong("id"));
+                    equipamento.setPatrimonio(
+                            resultSet.getString("patrimonio"));
+                    equipamento.setCategoria(
+                            resultSet.getString("categoria"));
+                    equipamento.setMarca(
+                            resultSet.getString("marca"));
+                    equipamento.setModelo(
+                            resultSet.getString("modelo"));
+                    equipamento.setNumeroSerie(
+                            resultSet.getString("numero_serie"));
+                    equipamento.setStatus(
+                            resultSet.getString("status"));
+
+                    long setorId = resultSet.getLong("setor_id");
+                    if (!resultSet.wasNull()) {
+                        equipamento.setSetorId(setorId);
+                    }
+
+                    equipamento.setSetorNome(
+                            resultSet.getString("setor_nome"));
+                    equipamento.setObservacoes(
+                            resultSet.getString("observacoes"));
+
+                    equipamentos.add(equipamento);
+                }
+            }
+        }
+
+        return equipamentos;
     }
 }

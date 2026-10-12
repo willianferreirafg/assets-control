@@ -36,16 +36,26 @@ public class EquipamentoServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        try {
-            List<Equipamento> equipamentos =
-                    equipamentoDAO.listarTodos();
+        System.out.println(
+                "### EQUIPAMENTO SERVLET ATUALIZADO ###"
+        );
 
-            List<Setor> setores =
-                    equipamentoDAO.listarSetores();
+        String termo = request.getParameter("busca");
+
+        try {
+            List<Equipamento> equipamentos;
+
+            if (termo == null || termo.isBlank()) {
+                equipamentos = equipamentoDAO.listarTodos();
+            } else {
+                equipamentos = equipamentoDAO.buscar(termo);
+            }
+
+            List<Setor> setores = equipamentoDAO.listarSetores();
 
             request.setAttribute("equipamentos", equipamentos);
             request.setAttribute("setores", setores);
-
+            request.setAttribute("busca", termo == null ? "" : termo);
             request.setAttribute(
                     "sucesso",
                     "1".equals(request.getParameter("sucesso"))
