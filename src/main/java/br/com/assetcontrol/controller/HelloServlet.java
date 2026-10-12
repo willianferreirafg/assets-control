@@ -1,4 +1,4 @@
-package br.com.assetcontrol.Controller;
+package br.com.assetcontrol.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

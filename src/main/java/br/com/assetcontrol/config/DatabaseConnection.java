@@ -23,6 +23,16 @@ public final class DatabaseConnection {
                 "ASSETCONTROL_DB_PASSWORD"
         );
 
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException(
+                    "Driver JDBC do PostgreSQL não encontrado. "
+                            + "Verifique o classpath da aplicação.",
+                    e
+            );
+        }
+
         return DriverManager.getConnection(url, user, password);
     }
 

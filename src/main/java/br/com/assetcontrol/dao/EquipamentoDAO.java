@@ -2,6 +2,7 @@ package br.com.assetcontrol.dao;
 
 import br.com.assetcontrol.config.DatabaseConnection;
 import br.com.assetcontrol.model.Equipamento;
+import br.com.assetcontrol.model.Setor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -145,5 +146,32 @@ public class EquipamentoDAO {
                 }
             }
         }
+    }
+
+    public List<Setor> listarSetores() throws SQLException {
+        String sql = """
+            SELECT id, nome, unidade_id
+            FROM setor
+            WHERE ativo = TRUE
+            ORDER BY nome
+            """;
+
+        List<Setor> setores = new ArrayList<>();
+
+        try (
+                Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet resultSet = statement.executeQuery()
+        ) {
+            while (resultSet.next()) {
+                Setor setor = new Setor();
+                setor.setId(resultSet.getLong("id"));
+                setor.setNome(resultSet.getString("nome"));
+                setor.setUnidadeId(resultSet.getLong("unidade_id"));
+                setores.add(setor);
+            }
+        }
+
+        return setores;
     }
 }
