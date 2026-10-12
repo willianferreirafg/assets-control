@@ -36,10 +36,6 @@ public class EquipamentoServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        System.out.println(
-                "### EQUIPAMENTO SERVLET ATUALIZADO ###"
-        );
-
         String termo = request.getParameter("busca");
 
         try {
@@ -60,6 +56,45 @@ public class EquipamentoServlet extends HttpServlet {
                     "sucesso",
                     "1".equals(request.getParameter("sucesso"))
             );
+
+            String editarTexto = request.getParameter("editar");
+
+            if (editarTexto != null && !editarTexto.isBlank()) {
+                try {
+                    long id = Long.parseLong(editarTexto);
+
+                    if (id <= 0) {
+                        response.sendError(
+                                HttpServletResponse.SC_BAD_REQUEST,
+                                "ID de equipamento inválido."
+                        );
+                        return;
+                    }
+
+                    var equipamentoEdicao =
+                            equipamentoDAO.buscarPorId(id);
+
+                    if (equipamentoEdicao.isEmpty()) {
+                        response.sendError(
+                                HttpServletResponse.SC_NOT_FOUND,
+                                "Equipamento não encontrado."
+                        );
+                        return;
+                    }
+
+                    request.setAttribute(
+                            "equipamentoEdicao",
+                            equipamentoEdicao.get()
+                    );
+
+                } catch (NumberFormatException e) {
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "ID de equipamento inválido."
+                    );
+                    return;
+                }
+            }
 
             request.getRequestDispatcher(
                     "/WEB-INF/views/equipamentos.jsp"
@@ -89,6 +124,29 @@ public class EquipamentoServlet extends HttpServlet {
         String setorIdTexto = valor(request, "setorId");
         String observacoes = valor(request, "observacoes");
 
+        String acao = valor(request, "acao");
+        boolean modoEdicao = "atualizar".equals(acao);
+
+        Long idEdicao = null;
+
+        if (modoEdicao) {
+            try {
+                idEdicao = Long.parseLong(valor(request, "id"));
+
+                if (idEdicao <= 0) {
+                    throw new NumberFormatException();
+                }
+
+            } catch (NumberFormatException e) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "ID de equipamento inválido."
+                );
+                return;
+            }
+        }
+
+        // Validação dos campos obrigatórios
         if (patrimonio.isBlank() || categoria.isBlank()) {
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
@@ -97,9 +155,13 @@ public class EquipamentoServlet extends HttpServlet {
             return;
         }
 
-        if (patrimonio.length() > 50 || categoria.length() > 50
-                || marca.length() > 80 || modelo.length() > 100
+        // Validação dos tamanhos dos campos
+        if (patrimonio.length() > 50
+                || categoria.length() > 50
+                || marca.length() > 80
+                || modelo.length() > 100
                 || numeroSerie.length() > 100) {
+
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     "Um ou mais campos excedem o tamanho permitido."
@@ -107,6 +169,7 @@ public class EquipamentoServlet extends HttpServlet {
             return;
         }
 
+        // Validação do status
         if (status.isBlank()) {
             status = "DISPONIVEL";
         }
@@ -119,6 +182,7 @@ public class EquipamentoServlet extends HttpServlet {
             return;
         }
 
+        // Validação do setor
         Long setorId = null;
 
         if (!setorIdTexto.isBlank()) {
@@ -128,6 +192,7 @@ public class EquipamentoServlet extends HttpServlet {
                 if (setorId <= 0) {
                     throw new NumberFormatException();
                 }
+
             } catch (NumberFormatException e) {
                 response.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
@@ -137,7 +202,9 @@ public class EquipamentoServlet extends HttpServlet {
             }
         }
 
+        // Criação do objeto equipamento
         Equipamento equipamento = new Equipamento();
+
         equipamento.setPatrimonio(patrimonio);
         equipamento.setCategoria(categoria);
         equipamento.setMarca(nuloSeVazio(marca));
@@ -147,15 +214,39 @@ public class EquipamentoServlet extends HttpServlet {
         equipamento.setSetorId(setorId);
         equipamento.setObservacoes(nuloSeVazio(observacoes));
 
+        // Cadastro ou atualização
         try {
-            equipamentoDAO.cadastrar(equipamento);
+            if (modoEdicao) {
+                equipamento.setId(idEdicao);
 
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/equipamentos?sucesso=1"
-            );
+                boolean atualizado =
+                        equipamentoDAO.atualizar(equipamento);
+
+                if (!atualizado) {
+                    response.sendError(
+                            HttpServletResponse.SC_NOT_FOUND,
+                            "Equipamento não encontrado."
+                    );
+                    return;
+                }
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/equipamentos?sucesso=2"
+                );
+
+            } else {
+                equipamentoDAO.cadastrar(equipamento);
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/equipamentos?sucesso=1"
+                );
+            }
 
         } catch (SQLException e) {
+
+            // Patrimônio ou número de série duplicado
             if ("23505".equals(e.getSQLState())) {
                 response.sendError(
                         HttpServletResponse.SC_CONFLICT,
@@ -165,6 +256,7 @@ public class EquipamentoServlet extends HttpServlet {
                 return;
             }
 
+            // Setor inexistente
             if ("23503".equals(e.getSQLState())) {
                 response.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
@@ -174,7 +266,7 @@ public class EquipamentoServlet extends HttpServlet {
             }
 
             throw new ServletException(
-                    "Erro ao cadastrar o equipamento.", e
+                    "Erro ao persistir o equipamento.", e
             );
         }
     }
