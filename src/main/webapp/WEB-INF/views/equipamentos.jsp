@@ -181,9 +181,8 @@
         </c:choose>
     </h2>
 
-    <form method="post"
-          action="${pageContext.request.contextPath}/equipamentos">
-
+    <form method="post" action="${pageContext.request.contextPath}/equipamentos">
+        <input type="hidden" name="_csrf" value="${_csrf}">
         <c:choose>
             <c:when test="${not empty equipamentoEdicao}">
                 <input type="hidden" name="acao" value="atualizar">
@@ -358,9 +357,7 @@
 
     <h2>Equipamentos cadastrados</h2>
 
-    <form method="get"
-          action="${pageContext.request.contextPath}/equipamentos">
-
+    <form method="get" action="${pageContext.request.contextPath}/equipamentos">
         <label class="full">
             Pesquisar por patrimônio, categoria, marca ou modelo
 
@@ -439,6 +436,8 @@
                             <form method="post"
                                   action="${pageContext.request.contextPath}/equipamentos"
                                   onsubmit="return confirm('Tem certeza de que deseja excluir este equipamento?');">
+
+                                <input type="hidden" name="_csrf" value="${_csrf}">
 
                                 <input type="hidden"
                                        name="acao"
